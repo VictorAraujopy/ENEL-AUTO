@@ -14,8 +14,6 @@ email = os.getenv("EMAIL")
 password = os.getenv("PASS")
 CAMINHO_FATURAS = os.path.join(os.getcwd(), "Faturas")
 def Config():
-    print(">> Configurando Selenium Puro...")
-    
     
     if not os.path.exists(CAMINHO_FATURAS):
         os.makedirs(CAMINHO_FATURAS)
@@ -63,16 +61,19 @@ def Enel_N(driver, wait):
         time.sleep(2)
         driver.execute_script("document.body.style.zoom='25%'")
         time.sleep(2)
+
         Dowload(driver, wait)
-    except:
-        print("erro")
+    except Exception as e:
+        print(f"Erro na navegação: {e}")
+        time.sleep(5)
+        Enel_N(driver, wait)
         
 def Dowload(driver, wait):
-    print(">> Iniciando Loop de Download (5 faturas)...")
+    print("Iniciando Loop de Download (5 faturas)")
     
     
     for i in range(5, 0, -1):
-        print(f">> Baixando fatura {i}...")
+        print(f" Baixando fatura {i}")
         try:
             
             wait.until(EC.element_to_be_clickable((By.XPATH, f'//*[@id="spa-root"]/div/app-main/aem-page/aem-model-provider/aem-responsivegrid/div[2]/aem-responsivegrid/div[1]/app-enel-debtcontrol/div/div[3]/div[3]/app-enel-debtcontrol-paymenthistory/div[3]/div[{i}]/div/div/div[2]/div/a'))).click()
@@ -96,7 +97,13 @@ def Dowload(driver, wait):
             driver.execute_script("document.body.style.zoom='25%'")
             
         except Exception as e:
-            driver.back() 
+            print(f"erro:{e}")
+            print("tentando novamente")
+            time.sleep(3)
+
+            driver.back()
+             
+            time.sleep(2)
             wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="spa-root"]/div/app-main/aem-page/aem-model-provider/aem-responsivegrid/div[2]/aem-responsivegrid/div[1]/app-enel-debtcontrol/div/div[3]/div[1]/div/div[2]/app-enel-button/button'))).click()
     quit()
 if __name__ == ("__main__"):
